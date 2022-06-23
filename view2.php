@@ -54,8 +54,7 @@ $(function(){
         parent.$("#name").val(awork[0]);
 
         var text = $(this).nextAll().eq(1).text();
-        text = text.replace("\n            ", "");
-        text = text.replaceAll("\n        ", "");
+        text = text.replace(/^\s+/, "");
         text = text.replace("<br>", "\n");
         parent.$("#text").val(text);
     });
