@@ -11,18 +11,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
-    <link id="link" rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css">
+    <link id="link" rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/redmond/jquery-ui.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="model.js?_=<?= time() ?>"></script>
 
 
 
 <script>
-jQuery.isMobile = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
-toastr.options={"closeButton":false,"debug":false,"newestOnTop":false,"progressBar":false,"positionClass":"toast-bottom-center","preventDuplicates":false,"onclick":null,"showDuration":"300","hideDuration":"1000","timeOut":"3000","extendedTimeOut":"1000","showEasing":"swing","hideEasing":"linear","showMethod":"fadeIn","hideMethod":"fadeOut"};
-if ( !$.isMobile ) {
-    toastr.options.positionClass = "toast-top-center";
-}
-
 $( function(){
 
     // 実行完了時に localStorage に保存された名前を復帰
@@ -70,40 +65,6 @@ $( function(){
         }
     });
 
-    // *************************************
-    // アップロード処理
-    // *************************************
-    $("#upload").on( "click", function(){
-
-        // if ( !confirm("アップロードを開始してもよろしいですか?") ) {
-        //     return;
-        // }
-
-        $( "#dialog-message" ).dialog({
-            modal: true,
-            title: "ダイアログのタイトルです",
-            close: function() {
-                $( this ).dialog( "close" );
-            },
-            buttons: [
-                { 
-                    text: "OK",
-                    click: function() {
-                        $( this ).dialog( "close" );
-                        file_upload();
-                    }
-                },
-                {
-                    text: "キャンセル",
-                    click: function() {
-                        $( this ).dialog( "close" );
-                    }
-                }
-            ]
-        });		
-
-    });
-
     // キーボードのキーが押された場合
     $("#text").keydown(function( e ){
 
@@ -126,60 +87,6 @@ $( function(){
     });
 
 });
-
-// *************************************
-// $.ajax ファイルアップロード
-// *************************************
-function file_upload() {
-
-    var formData = new FormData();
-
-    // 画像データサイズの制限
-    formData.append("MAX_FILE_SIZE", 10000000);
-
-    // formData に画像ファイルを追加
-    formData.append("image", $("#file").get(0).files[0]);
-    formData.append("id", $("#id").val() );
-
-    $.ajax({
-        url: "./upload.php",
-        type: "POST",
-        data: formData,
-        processData: false,  // jQuery がデータを処理しないよう指定
-        contentType: false   // jQuery が contentType を設定しないよう指定
-    })
-    .done(function( data, textStatus ){
-        console.log( "status:" + textStatus );
-        console.log( "data:" + JSON.stringify(data, null, "    ") );
-        
-        if ( data.image.error != 0 ) {
-            toastr.error(data.image.result);
-        }
-
-        $("#subject").val("");
-        $("#name").val("");
-        $("#text").val("");
-        $("#id").val("");
-
-        $("#file").val("");
-        $("#upload").prop("disabled", true);
-
-        // IFRAME 部分のリロード
-        $('#extend').get(0).contentWindow.location.href = "control.php?page=init";
-
-    })
-    .fail(function(jqXHR, textStatus, errorThrown ){
-        console.log( "status:" + textStatus );
-        console.log( "errorThrown:" + errorThrown );
-    })
-    .always(function() {
-
-        // 操作不可を解除
-        $("#content input").prop("disabled", false);
-    })
-    ;
-}
-
 </script>
 </head>
 
@@ -237,6 +144,9 @@ function file_upload() {
 
 <iframe id="extend" src="control.php?page=init" name="myframe"></iframe>
 
+<div id="dialog-message-delete" style='display:none;'>
+削除してもよろしいですか?
+</div>
 <div id="dialog-message" style='display:none;'>
 アップロードを開始してもよろしいですか?
 </div>
